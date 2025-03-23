@@ -1,19 +1,19 @@
 "use client"
-import Camera from "@/components/camera";
+import Camera, {CameraRef} from "@/components/camera";
 import {Button} from "@/components/ui/button";
-import {useRef, useState} from "react";
+import {ChangeEvent, useRef, useState} from "react";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 
 export default function CaptureView() {
-    const camRef = useRef(null)
+    const camRef = useRef<CameraRef>(null)
     const [captured, setCaptured] = useState(false)
     const [responseText, setResponseText] = useState("")
     const [src, setSrc] = useState("")
-    const [csvFile, setCsvFile] = useState(null);
+    const [csvFile, setCsvFile] = useState<File | null>(null);
 
-    const handleCsvUpload = (e) => {
+    const handleCsvUpload = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             setCsvFile(e.target.files[0]);
         }
@@ -50,8 +50,20 @@ export default function CaptureView() {
 
         // 2) If CSV is chosen, read it as base64
         const reader = new FileReader();
-        reader.onload = (e) => {
-            const csvBase64 = e.target.result.split(",")[1];
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+            // e.target.result can be ArrayBuffer | string | null
+            const result = e.target?.result;
+            if (typeof result !== "string") {
+                // If it's ArrayBuffer or null, do nothing or handle error
+                console.error("Could not read CSV file as base64 string");
+                return;
+            }
+            // Remove the data URL prefix => the part before ","
+            const csvBase64 = result.split(",")[1];
+            if (!csvBase64) {
+                console.error("No CSV base64 content found");
+                return;
+            }
 
             // Post both image & CSV
             fetch("/api", {
@@ -76,7 +88,7 @@ export default function CaptureView() {
         reader.readAsDataURL(csvFile);
     };
 
-    const downloadCsv = (csvBase64) => {
+    const downloadCsv = (csvBase64: string) => {
         const blob = b64toBlob(csvBase64, "text/csv");
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
@@ -84,7 +96,7 @@ export default function CaptureView() {
         link.click();
     };
 
-    const b64toBlob = (b64Data, contentType = "", sliceSize = 512) => {
+    const b64toBlob = (b64Data: string, contentType = "", sliceSize = 512) => {
         const byteCharacters = atob(b64Data);
         const byteArrays = [];
         for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {

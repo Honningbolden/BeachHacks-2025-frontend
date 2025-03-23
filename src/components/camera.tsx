@@ -5,9 +5,15 @@ import {forwardRef, useCallback, useImperativeHandle, useRef, useState} from "re
 import {Button} from "@/components/ui/button";
 import {SwitchCamera} from "lucide-react";
 
-const Camera = forwardRef((props, ref) => {
-    const webcamRef = useRef(null)
-    const [imgSrc, setImgSrc] = useState(null)
+export interface CameraRef {
+    capture: () => string | null;
+    retake: () => void;
+    imgSrc: string | null;
+}
+
+const Camera = forwardRef<CameraRef, {}>((props, ref) => {
+    const webcamRef = useRef<Webcam>(null)
+    const [imgSrc, setImgSrc] = useState<string | null>(null)
     const [facingMode, setFacingMode] = useState("environment");
 
     useImperativeHandle(ref, () => ({
@@ -17,6 +23,7 @@ const Camera = forwardRef((props, ref) => {
                 setImgSrc(src)
                 return src
             }
+            return null
         },
         retake: () => {
             setImgSrc(null)
