@@ -25,8 +25,8 @@ export default function CaptureView() {
             if (!csvFile) {
                 fetch("/api", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ image: imageBase64 })
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({image: imageBase64})
                 })
                     .then((res) => res.json())
                     .then((data) => {
@@ -53,8 +53,8 @@ export default function CaptureView() {
             // Post both image & CSV
             fetch("/api", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ image: imageBase64, csv: csvBase64 })
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({image: imageBase64, csv: csvBase64})
             })
                 .then((res) => res.json())
                 .then((data) => {
@@ -93,7 +93,7 @@ export default function CaptureView() {
             const byteArray = new Uint8Array(byteNumbers);
             byteArrays.push(byteArray);
         }
-        return new Blob(byteArrays, { type: contentType });
+        return new Blob(byteArrays, {type: contentType});
     };
 
     const handleCapture = () => {
@@ -115,17 +115,19 @@ export default function CaptureView() {
 
     return (
         <div>
-            <input type="file" accept=".csv" onChange={handleCsvUpload} />
             <Camera ref={camRef}/>
-            <div className={"flex justify-center w-full mt-4 h-screen"}>
-                {captured ? (
-                    <>
-                        <Button onClick={handleBackendCall} variant={"default"}>Upload</Button>
-                        <Button onClick={handleRetake} variant={"outline"}>Retake</Button>
-                    </>
-                ) : (
-                    <Button onClick={handleCapture} variant={"default"}>Capture</Button>
-                )}
+            <div className={"flex flex-col justify-center w-full mt-4 absolute bottom-4"}>
+                <input type="file" accept=".csv" onChange={handleCsvUpload}/>
+                <div className={"flex flex-row justify-center"}>
+                    {captured ? (
+                        <>
+                            <Button onClick={handleBackendCall} variant={"default"}>Upload</Button>
+                            <Button onClick={handleRetake} variant={"outline"}>Retake</Button>
+                        </>
+                    ) : (
+                        <Button onClick={handleCapture} variant={"default"}>Capture</Button>
+                    )}
+                </div>
             </div>
             {responseText && <p>{responseText}</p>}
         </div>
