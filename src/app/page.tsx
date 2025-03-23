@@ -3,7 +3,7 @@ import CaptureView from "@/components/capture-view";
 
 export default function Home() {
   return (
-      <main>
+      <main className={""}>
           <CaptureView/>
       </main>
   );

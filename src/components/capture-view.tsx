@@ -2,6 +2,9 @@
 import Camera from "@/components/camera";
 import {Button} from "@/components/ui/button";
 import {useRef, useState} from "react";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
 
 export default function CaptureView() {
     const camRef = useRef(null)
@@ -114,22 +117,38 @@ export default function CaptureView() {
     }
 
     return (
-        <div>
-            <Camera ref={camRef}/>
-            <div className={"flex flex-col justify-center w-full mt-4 absolute bottom-4"}>
-                <input type="file" accept=".csv" onChange={handleCsvUpload}/>
-                <div className={"flex flex-row justify-center"}>
-                    {captured ? (
-                        <>
-                            <Button onClick={handleBackendCall} variant={"default"}>Upload</Button>
-                            <Button onClick={handleRetake} variant={"outline"}>Retake</Button>
-                        </>
-                    ) : (
-                        <Button onClick={handleCapture} variant={"default"}>Capture</Button>
-                    )}
-                </div>
+        <div className={"h-svh flex flex-col items-center p-4 bg-background"}>
+            <div className={"w-full max-w-md h-auto flex flex-col justify-center"}>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Capture & Upload</CardTitle>
+                        <CardDescription>
+                            Capture a receipt, optinally upload your CSV budget, and then send them to the server.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className={"flex-grow overflow-hidden flex flex-col items-center justify-center"}>
+                        <div className={"w-full h-auto mb-4"}>
+                            <Camera ref={camRef}/>
+                        </div>
+
+                        <div className={"grid w-full max-w-sm items-center gap-1.5"}>
+                            <Label htmlFor={"csvFile"}>Picture</Label>
+                            <Input id={"csvFile"} type="file" accept=".csv" onChange={handleCsvUpload}/>
+                        </div>
+                    </CardContent>
+
+                    <CardFooter className={"flex justify-between"}>
+                        {captured ? (
+                            <>
+                                <Button onClick={handleBackendCall} variant={"default"}>Upload</Button>
+                                <Button onClick={handleRetake} variant={"outline"}>Retake</Button>
+                            </>
+                        ) : (
+                            <Button onClick={handleCapture} variant={"default"}>Capture</Button>
+                        )}
+                    </CardFooter>
+                </Card>
             </div>
-            {responseText && <p>{responseText}</p>}
         </div>
     )
 }
